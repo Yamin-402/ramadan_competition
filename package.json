@@ -1,0 +1,21 @@
+{
+  "name": "ramadan_competition",
+  "version": "1.0.0",
+  "description": "مسابقة رمضان",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "moment-timezone": "^0.5.47",
+    "node": "^23.9.0",
+    "pg": "^8.13.3",
+    "praytimes": "^0.0.5",
+    "sqlite3": "^5.1.7"
+  }
+}

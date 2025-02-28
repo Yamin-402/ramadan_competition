@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المتسابقين</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background: #2c3e50;
+            min-height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .nav-link {
+            color: #bdc3c7 !important;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background: #34495e;
+            color: #ecf0f1 !important;
+        }
+        .user-card {
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        .user-card:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- القائمة الجانبية -->
+        <div class="sidebar p-3 text-white" style="width: 250px;">
+            <h4 class="mb-4">لوحة التحكم</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a href="/admin/tasks" class="nav-link">المهام</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="/admin/questions" class="nav-link">الأسئلة</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="/admin/participants" class="nav-link active">المتسابقين</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="flex-grow-1 p-4 bg-light">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">المتسابقين المسجلين</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>النقاط</th>
+                                <th>آخر نشاط</th>
+                                <th>عدد النشاطات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr class="user-card">
+                                    <td><%= user.username %></td>
+                                    <td><span class="badge bg-success"><%= user.points %></span></td>
+                                    <td><%= moment(user.last_activity).format('YYYY-MM-DD HH:mm') %></td>
+                                    <td><%= user.activities_count %></td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="/admin/user-logs/<%= user.id %>" 
+                                               class="btn btn-sm btn-info">
+                                               <i class="fas fa-history"></i> السجل
+                                            </a>
+                                            <form action="/admin/adjust-points/<%= user.id %>" 
+                                                  method="POST" 
+                                                  class="input-group" 
+                                                  style="max-width: 200px;">
+                                                <input type="number" 
+                                                       step="0.125" 
+                                                       name="points" 
+                                                       class="form-control form-control-sm" 
+                                                       placeholder="تعديل النقاط">
+                                                <button class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(<%= user.id %>)">حذف</button>
+                                                <form id="deleteForm-<%= user.id %>" action="/admin/delete-user/<%= user.id %>" method="POST" style="display: none;">
+                                                    <button type="submit" class="btn btn-danger btn-sm">تأكيد الحذف</button>
+                                                </form>
+                                            </td>
+                                            
+                                            <script>
+                                                function confirmDelete(userId) {
+                                                    if (confirm("هل أنت متأكد من حذف هذا المتسابق؟")) {
+                                                        document.getElementById(`deleteForm-${userId}`).style.display = 'inline';
+                                                    }
+                                                }
+                                            </script>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

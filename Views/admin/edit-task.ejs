@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل المهمة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h4>تعديل المهمة</h4>
+            </div>
+            <div class="card-body">
+                <form action="/admin/update-task/<%= task.id %>" method="POST">
+                    <div class="mb-3">
+                        <label>اسم المهمة</label>
+                        <input type="text" name="task_name" class="form-control" value="<%= task.task_name %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>نوع المهمة</label>
+                        <select name="task_type" class="form-select" required>
+                            <option value="عادية" <%= task.task_type === 'عادية' ? 'selected' : '' %>>عادية</option>
+                            <option value="عددية" <%= task.task_type === 'عددية' ? 'selected' : '' %>>عددية</option>
+                            <option value="مشروطة" <%= task.task_type === 'مشروطة' ? 'selected' : '' %>>مشروطة</option>
+                            <option value="موقوت" <%= task.task_type === 'موقوت' ? 'selected' : '' %>>موقوت</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>التصنيف</label>
+                        <select name="task_category" class="form-select" required>
+                            <option value="مهمة" <%= task.task_category === 'مهمة' ? 'selected' : '' %>>مهمة</option>
+                            <option value="ممنوع" <%= task.task_category === 'ممنوع' ? 'selected' : '' %>>ممنوع</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>التكرار</label>
+                        <select name="task_repeat" class="form-select" required>
+                            <option value="منفرد" <%= task.task_repeat === 'منفرد' ? 'selected' : '' %>>منفرد</option>
+                            <option value="متعدد" <%= task.task_repeat === 'متعدد' ? 'selected' : '' %>>متعدد</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>النقاط</label>
+                        <input type="number" name="points" step="0.25" class="form-control" value="<%= task.points %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>التفاصيل</label>
+                        <textarea name="details" class="form-control"><%= task.details %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label>المهام الفرعية (فقط للمهام المشروطة)</label>
+                        <div id="subtasks-container">
+                            <% subtasks.forEach(subtask => { %>
+                                <div class="input-group mb-2">
+                                    <input type="text" name="subtasks[]" value="<%= subtask.description %>" class="form-control">
+                                    <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">حذف</button>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addSubtaskField()">+ إضافة مهمة فرعية</button>
+                    </div>
+                    <div class="mb-3" id="min-threshold-container" style="display: <%= task.task_type === 'موقوت' ? 'block' : 'none' %>;">
+                        <label>الحد الأدنى (بالنسبة المئوية)</label>
+                        <input type="number" name="min_threshold" class="form-control" value="<%= task.min_threshold || 0 %>" min="0" max="100">
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">حفظ التعديلات</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addSubtaskField() {
+            const container = document.getElementById('subtasks-container');
+            const newField = document.createElement('div');
+            newField.className = 'input-group mb-2';
+            newField.innerHTML = `
+                <input type="text" name="subtasks[]" class="form-control" placeholder="وصف المهمة الفرعية">
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">حذف</button>
+            `;
+            container.appendChild(newField);
+        }
+
+        document.querySelector('select[name="task_type"]').addEventListener('change', function() {
+            const subtasksContainer = document.getElementById('subtasks-container');
+            const minThresholdContainer = document.getElementById('min-threshold-container');
+            if (this.value === 'مشروطة') {
+                subtasksContainer.style.display = 'block';
+                minThresholdContainer.style.display = 'none';
+            } else if (this.value === 'موقوت') {
+                subtasksContainer.style.display = 'none';
+                minThresholdContainer.style.display = 'block';
+            } else {
+                subtasksContainer.style.display = 'none';
+                minThresholdContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

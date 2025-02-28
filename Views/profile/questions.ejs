@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأسئلة اليومية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body
+
+class="bg-light">
+<%- include('../partials/navbar', { user, dayOfRamadan }) %>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4>سؤال اليوم</h4>
+            </div>
+            <div class="card-body">
+                <% if (dailyQuestion) { %>
+                    <form action="/answer-question/<%= user.id %>" method="POST">
+                        <input type="hidden" name="questionId" value="<%= dailyQuestion.id %>">
+                        <div class="mb-3">
+                            <h5><%= dailyQuestion.question %></h5>
+                            <label>اختر الإجابة الصحيحة:</label>
+                            <select name="answer" class="form-control" required>
+                                <option value="1"><%= dailyQuestion.option1 %></option>
+                                <option value="2"><%= dailyQuestion.option2 %></option>
+                                <option value="3"><%= dailyQuestion.option3 %></option>
+                                <option value="4"><%= dailyQuestion.option4 %></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>سبب الإجابة (اختياري):</label>
+                            <textarea name="reason" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">إرسال الإجابة</button>
+                    </form>
+                <% } else { %>
+                    <div class="alert alert-info">لا يوجد سؤال اليوم.</div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

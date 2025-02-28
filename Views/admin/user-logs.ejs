@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل المتسابق</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <%- include('../partials/navbar', { user, dayOfRamadan }) %>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>سجل المتسابق: <%= user.username %></h4>
+            </div>
+            <div class="card-body">
+                <% const groupedLogs = {}; %>
+<% logs.forEach(log => { %>
+    <% if (log.task_category !== 'ممنوع') { %>
+        <% const day = moment(log.created_at).tz("Africa/Cairo").format("اليوم: D من رمضان"); %>
+        <% if (!groupedLogs[day]) { %>
+            <% groupedLogs[day] = { logs: [], totalPoints: 0, totalDeductions: 0, totalBalance: 0 }; %>
+        <% } %>
+        <% groupedLogs[day].logs.push(log); %>
+        <% if (log.points > 0) { %>
+            <% groupedLogs[day].totalPoints += log.points; %>
+        <% } else { %>
+            <% groupedLogs[day].totalDeductions += Math.abs(log.points); %>
+        <% } %>
+        <% groupedLogs[day].totalBalance = groupedLogs[day].totalPoints - groupedLogs[day].totalDeductions; %>
+    <% } %>
+<% }) %>
+
+<% let totalBalance = 0; %>
+<% Object.keys(groupedLogs).sort((a, b) => moment(b, "اليوم: D من رمضان") - moment(a, "اليوم: D من رمضان")).forEach(day => { %>
+    <div class="mb-4">
+        <h5><%= day %></h5>
+        <div class="alert alert-info">
+            <strong>النقاط المكتسبة:</strong> <%= groupedLogs[day].totalPoints %>
+            <br>
+            <strong>النقاط المخصومة:</strong> <%= groupedLogs[day].totalDeductions %>
+            <br>
+            <strong>الإجمالي اليومي:</strong> <%= groupedLogs[day].totalBalance %>
+            <br>
+            <strong>الإجمالي الكلي:</strong> <%= (totalBalance += groupedLogs[day].totalBalance) %>
+        </div>
+        <% groupedLogs[day].logs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).forEach(log => { %>
+            <div class="alert alert-light mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6><%= log.task_name %></h6>
+                        <small>النوع: <%= log.task_type %></small>
+                        <% if(log.task_type === 'موقوت' && log.value) { %>
+                            <small>الدقائق: <%= log.value %></small>
+                        <% } %>
+                    </div>
+                    <span class="<%= log.points > 0 ? 'text-success' : 'text-danger' %>">
+                        <%= log.points %> نقطة
+                    </span>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+<% }) %>ٍ
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل السؤال</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h4>تعديل السؤال</h4>
+            </div>
+            <div class="card-body">
+                <form action="/admin/update-question/<%= question.id %>" method="POST">
+                    <div class="mb-3">
+                        <label>السؤال</label>
+                        <input type="text" name="question" class="form-control" value="<%= question.question %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>الخيار 1</label>
+                        <input type="text" name="option1" class="form-control" value="<%= question.option1 %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>الخيار 2</label>
+                        <input type="text" name="option2" class="form-control" value="<%= question.option2 %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>الخيار 3</label>
+                        <input type="text" name="option3" class="form-control" value="<%= question.option3 %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>الخيار 4</label>
+                        <input type="text" name="option4" class="form-control" value="<%= question.option4 %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>الإجابة الصحيحة</label>
+                        <select name="correct_option" class="form-select" required>
+                            <option value="1" <%= question.correct_option == 1 ? 'selected' : '' %>>الخيار 1</option>
+                            <option value="2" <%= question.correct_option == 2 ? 'selected' : '' %>>الخيار 2</option>
+                            <option value="3" <%= question.correct_option == 3 ? 'selected' : '' %>>الخيار 3</option>
+                            <option value="4" <%= question.correct_option == 4 ? 'selected' : '' %>>الخيار 4</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>النقاط</label>
+                        <input type="number" name="points" step="0.25" class="form-control" value="<%= question.points %>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">حفظ التعديلات</button>
+                </form>
+</body>
+</html>
