@@ -28,6 +28,8 @@ console.log('Views directory set to:', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
+console.log('Current directory:', __dirname);
+console.log('Views directory set to:', path.join(__dirname, 'views'));
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes الأساسية
@@ -654,6 +656,16 @@ db.run('PRAGMA journal_mode=WAL;', (err) => {
     } else {
         console.log("تم تمكين وضع WAL بنجاح.");
     }
+});
+
+const fs = require('fs');
+
+fs.readdir(path.join(__dirname, 'views'), (err, files) => {
+  if (err) {
+    console.error('Error reading views directory:', err);
+  } else {
+    console.log('Files in views directory:', files);
+  }
 });
 
 // تشغيل الخادم
