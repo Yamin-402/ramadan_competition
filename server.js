@@ -641,3 +641,5 @@ db.run('PRAGMA journal_mode=WAL;', (err) => {
 });
 
 // تشغيل الخادم
+const PORT = 8000;
+app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
