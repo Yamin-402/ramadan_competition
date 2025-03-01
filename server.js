@@ -21,11 +21,8 @@ app.set('trust proxy', 1);
 moment.tz.setDefault('Africa/Cairo');
 
 
-// تعيين محرك العرض إلى EJS
-app.set('view engine', 'ejs');
-
-// تعيين مسار المجلد الذي يحتوي على ملفات القوالب
-app.set('views', path.join(__dirname, 'views'));
+console.log('Current directory:', __dirname);
+console.log('Views directory set to:', path.join(__dirname, 'views'));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -34,7 +31,18 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes الأساسية
-app.get('/', (req, res) => res.render('index'));
+app.get('/', (req, res) => {
+  console.log('Rendering index.ejs...');
+  res.render('index', {}, (err, html) => {
+    if (err) {
+      console.error('Error rendering index.ejs:', err);
+      res.status(500).send('Error rendering page');
+    } else {
+      console.log('index.ejs rendered successfully.');
+      res.send(html);
+    }
+  });
+});
 app.get('/login', (req, res) => res.render('login', { error: null }));
 app.get('/register', (req, res) => res.render('register', { error: null }));
 
