@@ -33,18 +33,7 @@ console.log('Views directory set to:', path.join(__dirname, 'views'));
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes الأساسية
-app.get('/', (req, res) => {
-  console.log('Rendering index.ejs...');
-  res.render('index', {}, (err, html) => {
-    if (err) {
-      console.error('Error rendering index.ejs:', err);
-      res.status(500).send('Error rendering page');
-    } else {
-      console.log('index.ejs rendered successfully.');
-      res.send(html);
-    }
-  });
-});
+app.get('/',(req, res) => res.render('register', { error: null }));
 app.get('/login', (req, res) => res.render('login', { error: null }));
 app.get('/register', (req, res) => res.render('register', { error: null }));
 
