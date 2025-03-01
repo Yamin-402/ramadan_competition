@@ -16,6 +16,7 @@ const limiter = rateLimit({
     max: 100 // حدد عدد الطلبات لكل IP
 });
 app.use(limiter);
+app.set('trust proxy', 1);
 
 moment.tz.setDefault('Africa/Cairo');
 const path = require('path');
