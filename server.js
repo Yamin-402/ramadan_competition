@@ -18,6 +18,13 @@ const limiter = rateLimit({
 app.use(limiter);
 
 moment.tz.setDefault('Africa/Cairo');
+const path = require('path');
+
+// تعيين محرك العرض إلى EJS
+app.set('view engine', 'ejs');
+
+// تعيين مسار المجلد الذي يحتوي على ملفات القوالب
+app.set('views', path.join(__dirname, 'views'));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
