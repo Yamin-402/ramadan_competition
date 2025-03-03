@@ -15,6 +15,18 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
+
+db.run(`ALTER TABLE task_logs ADD COLUMN fasting_status TEXT`, (err) => {
+    if (err) {
+        if (err.message.includes("duplicate column name")) {
+            console.log("✅ العمود fasting_status موجود بالفعل، لا حاجة للإضافة.");
+        } else {
+            console.error("❌ خطأ أثناء إضافة العمود fasting_status:", err.message);
+        }
+    } else {
+        console.log("✅ تم إضافة العمود fasting_status بنجاح!");
+    }
+});
 app.use(limiter);
 app.set('trust proxy', 1);
 
