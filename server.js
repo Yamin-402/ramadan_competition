@@ -15,6 +15,11 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
+app.use(limiter);
+app.set('trust proxy', 1);
+
+moment.tz.setDefault('Africa/Cairo');
+
 
 db.run(`ALTER TABLE task_logs ADD COLUMN fasting_status TEXT`, (err) => {
     if (err) {
@@ -27,21 +32,14 @@ db.run(`ALTER TABLE task_logs ADD COLUMN fasting_status TEXT`, (err) => {
         console.log("✅ تم إضافة العمود fasting_status بنجاح!");
     }
 });
-app.use(limiter);
-app.set('trust proxy', 1);
-
-moment.tz.setDefault('Africa/Cairo');
 
 
-console.log('Current directory:', __dirname);
-console.log('Views directory set to:', path.join(__dirname, 'views'));
+
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-console.log('Current directory:', __dirname);
-console.log('Views directory set to:', path.join(__dirname, 'views'));
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes الأساسية
@@ -101,6 +99,13 @@ app.post('/login', (req, res) => {
 app.get('/profile/:id/tasks', (req, res) => {
     const userId = req.params.id;
 
+    // جلب أوقات الفجر والمغرب
+    const { fajr, maghrib } = getPrayerTimes();
+    const now = moment().tz("Africa/Cairo");
+
+    // تحديد ما إذا كان المستخدم في وقت الصيام
+    const isFastingNow = now.isBetween(moment(fajr, "HH:mm"), moment(maghrib, "HH:mm"));
+
     db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
         if (err || !user) {
             console.error(err);
@@ -113,7 +118,7 @@ app.get('/profile/:id/tasks', (req, res) => {
                 return res.status(500).send("خطأ في جلب قائمة المهام");
             }
 
-            res.render('profile/tasks', { user, tasks, moment, dayOfRamadan });
+            res.render('profile/tasks', { user, tasks, moment, dayOfRamadan, isFastingNow });
         });
     });
 });
@@ -169,6 +174,13 @@ app.get('/profile/:id/questions', (req, res) => {
 app.get('/profile/:id/prohibited-tasks', (req, res) => {
     const userId = req.params.id;
 
+    // جلب أوقات الفجر والمغرب
+    const { fajr, maghrib } = getPrayerTimes();
+    const now = moment().tz("Africa/Cairo");
+
+    // تحديد ما إذا كان المستخدم في وقت الصيام
+    const isFastingNow = now.isBetween(moment(fajr, "HH:mm"), moment(maghrib, "HH:mm"));
+
     db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
         if (err || !user) {
             console.error(err);
@@ -181,7 +193,7 @@ app.get('/profile/:id/prohibited-tasks', (req, res) => {
                 return res.status(500).send("خطأ في جلب قائمة المهام الممنوعة");
             }
 
-            res.render('profile/prohibited-tasks', { user, tasks, moment, dayOfRamadan });
+            res.render('profile/prohibited-tasks', { user, tasks, moment, dayOfRamadan, isFastingNow });
         });
     });
 });
@@ -511,7 +523,7 @@ const getPrayerTimes = () => {
 
 app.post('/complete-task/:userId', (req, res) => {
     const userId = req.params.userId;
-    const { taskId, value } = req.body;
+    const { taskId, value, fasting_status } = req.body;
 
     db.get('SELECT * FROM tasks WHERE id = ?', [taskId], (err, task) => {
         if (err || !task) {
@@ -519,12 +531,9 @@ app.post('/complete-task/:userId', (req, res) => {
             return res.status(500).send("خطأ في جلب بيانات المهمة");
         }
 
-        const { fajr, maghrib } = getPrayerTimes();
-        const now = moment().tz("Africa/Cairo");
-        const isFastingTime = now.isBetween(moment(fajr, "HH:mm"), moment(maghrib, "HH:mm"));
-        const pointsMultiplier = isFastingTime ? 1.5 : 1;
+        const pointsMultiplier = fasting_status === "fasting" ? 1.5 : 1;
+        let points = 0;
 
-        let points;
         if (task.task_type === 'عددية') {
             const times = parseInt(value) || 1;
             points = task.is_negative ? -task.points * pointsMultiplier * times : task.points * pointsMultiplier * times;
@@ -534,40 +543,34 @@ app.post('/complete-task/:userId', (req, res) => {
             const minThreshold = task.min_threshold || 0;
             const effectivePercentage = Math.max(percentage, minThreshold);
             points = task.points * (effectivePercentage / 100) * pointsMultiplier;
-            if (task.is_negative) points = -points; // إذا كانت المهمة ممنوعة
+            if (task.is_negative) points = -points;
         } else {
             points = task.is_negative ? -task.points * pointsMultiplier : task.points * pointsMultiplier;
         }
 
-        // تحديث نقاط المستخدم
-        db.run(`
-            UPDATE users SET points = points + ? WHERE id = ?
-        `, [points, userId], (err) => {
+        db.run(`UPDATE users SET points = points + ? WHERE id = ?`, [points, userId], (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send("خطأ في تحديث النقاط");
             }
 
-            // تسجيل المهمة في السجل
             db.run(`
-                INSERT INTO task_logs (user_id, task_id, task_type, task_name, task_category, value, points)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `, [userId, task.id, task.task_type, task.task_name, task.task_category, value || null, points], (err) => {
+                INSERT INTO task_logs (user_id, task_id, task_type, task_name, task_category, value, points, fasting_status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `, [userId, task.id, task.task_type, task.task_name, task.task_category, value || null, points, fasting_status], (err) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).send("خطأ في إكمال المهمة");
                 }
 
-                // إعادة التوجيه إلى الصفحة الصحيحة
-                if (task.task_category === 'ممنوع') {
-                    return res.redirect(`/profile/${userId}/prohibited-tasks`);
-                } else {
-                    return res.redirect(`/profile/${userId}/tasks`);
-                }
+                // ✅ التحقق من إعادة التوجيه بشكل صحيح
+                return res.redirect(`/profile/${userId}/prohibited-tasks`);
             });
         });
     });
 });
+
+
 
 app.post('/admin/adjust-points/:userId', (req, res) => {
     const userId = req.params.userId;
@@ -596,15 +599,26 @@ app.get('/admin/participants', (req, res) => {
     });
 });
 
-app.get('/leaderboard', (req, res) => {
-    db.all('SELECT * FROM users WHERE show_in_leaderboard = 1 AND is_admin = 0 ORDER BY points DESC', (err, users) => {
-        if (err) {
+app.get('/leaderboard/:id', (req, res) => {
+    const userId = req.params.id;
+
+    db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user) {
             console.error(err);
-            return res.status(500).send("خطأ في جلب بيانات المتصدرين");
+            return res.status(500).send("خطأ في جلب بيانات المستخدم");
         }
-        return res.render('leaderboard', { dayOfRamadan, users, user: req.user  });
+
+        db.all('SELECT * FROM users WHERE show_in_leaderboard = 1 AND is_admin = 0 ORDER BY points DESC', (err, users) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send("خطأ في جلب بيانات المتصدرين");
+            }
+            res.render('leaderboard', { dayOfRamadan, users, user });
+        });
     });
 });
+
+
 
 
 
@@ -661,13 +675,6 @@ db.run('PRAGMA journal_mode=WAL;', (err) => {
 
 const fs = require('fs');
 
-fs.readdir(path.join(__dirname, 'views'), (err, files) => {
-  if (err) {
-    console.error('Error reading views directory:', err);
-  } else {
-    console.log('Files in views directory:', files);
-  }
-});
 
 // تشغيل الخادم
 const PORT = 8000;
