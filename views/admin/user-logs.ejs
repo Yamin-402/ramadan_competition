@@ -54,6 +54,9 @@
                         <% if(log.task_type === 'موقوت' && log.value) { %>
                             <small>الدقائق: <%= log.value %></small>
                         <% } %>
+                        <% if(log.value && log.task_type === 'عددية' ) { %>
+                            <small>الكمية: <%= log.value %></small>
+                        <% } %>
                     </div>
                     <span class="<%= log.points > 0 ? 'text-success' : 'text-danger' %>">
                         <%= log.points %> نقطة
