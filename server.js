@@ -564,7 +564,11 @@ app.post('/complete-task/:userId', (req, res) => {
                 }
 
                 // ✅ التحقق من إعادة التوجيه بشكل صحيح
-                return res.redirect(`/profile/${userId}/prohibited-tasks`);
+                if (task.task_category === 'ممنوع') {
+    return res.redirect(`/profile/${userId}/prohibited-tasks`);
+} else {
+    return res.redirect(`/profile/${userId}/tasks`);
+}
             });
         });
     });
