@@ -15,9 +15,9 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
+require('dotenv').config(); // Load .env file
 const { google } = require('googleapis');
 const fs = require('fs');
-const path = require('path');
 
 const DB_FILE = './database.db';
 const DRIVE_FILE_ID = process.env.GOOGLE_DRIVE_FILE_ID;
@@ -29,11 +29,28 @@ if (!DRIVE_FILE_ID) {
   process.exit(1);
 }
 
+// Verify service account key file
+const keyFilePath = path.join(__dirname, 'service-account-key.json');
+console.log('Service account key file path:', keyFilePath);
+
+if (!fs.existsSync(keyFilePath)) {
+  console.error('Error: Service account key file not found!');
+  process.exit(1);
+}
+
 // Initialize Google Drive client with service account
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, 'service-account-key.json'),
+  keyFile: keyFilePath,
   scopes: ['https://www.googleapis.com/auth/drive.file'],
 });
+
+// Log service account email
+auth.getCredentials().then((credentials) => {
+  console.log('Service account email:', credentials.client_email);
+}).catch((err) => {
+  console.error('Error retrieving service account email:', err);
+});
+
 const drive = google.drive({ version: 'v3', auth });
 
 // Download database from Google Drive
@@ -53,6 +70,7 @@ async function downloadDatabase() {
 }
 
 // Upload database to Google Drive
+sqlite3 database.db "PRAGMA wal_checkpoint(FULL);"
 async function uploadDatabase() {
   try {
     console.log('Uploading database to Google Drive...');
@@ -71,8 +89,25 @@ async function uploadDatabase() {
 
 // At startup
 downloadDatabase().then(() => {
-    const PORT = 8000;
-    app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
+  const PORT = 8000;
+  app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('Shutting down...');
+  await uploadDatabase();
+  process.exit(0);
+});
+
+// Crash protection
+process.on('uncaughtException', (err) => {
+  console.error('CRASH PREVENTION:', err);
+  uploadDatabase().finally(() => process.exit(1));
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('ASYNC ERROR:', err);
 });
 
 app.use(limiter);
