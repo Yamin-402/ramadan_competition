@@ -15,6 +15,66 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
+const { google } = require('googleapis');
+const fs = require('fs');
+const path = require('path');
+
+const DB_FILE = './database.db';
+const DRIVE_FILE_ID = process.env.GOOGLE_DRIVE_FILE_ID;
+
+// Log environment variables for debugging
+console.log('Google Drive File ID:', DRIVE_FILE_ID);
+if (!DRIVE_FILE_ID) {
+  console.error('Error: GOOGLE_DRIVE_FILE_ID is missing!');
+  process.exit(1);
+}
+
+// Initialize Google Drive client with service account
+const auth = new google.auth.GoogleAuth({
+  keyFile: path.join(__dirname, 'service-account-key.json'),
+  scopes: ['https://www.googleapis.com/auth/drive.file'],
+});
+const drive = google.drive({ version: 'v3', auth });
+
+// Download database from Google Drive
+async function downloadDatabase() {
+  try {
+    console.log('Downloading database from Google Drive...');
+    const response = await drive.files.get(
+      { fileId: DRIVE_FILE_ID, alt: 'media' },
+      { responseType: 'stream' }
+    );
+    response.data
+      .pipe(fs.createWriteStream(DB_FILE))
+      .on('finish', () => console.log('Database downloaded!'));
+  } catch (err) {
+    console.error('Google Drive download error:', err.message);
+  }
+}
+
+// Upload database to Google Drive
+async function uploadDatabase() {
+  try {
+    console.log('Uploading database to Google Drive...');
+    await drive.files.update({
+      fileId: DRIVE_FILE_ID,
+      media: {
+        body: fs.createReadStream(DB_FILE),
+        mimeType: 'application/x-sqlite3'
+      }
+    });
+    console.log('Database uploaded!');
+  } catch (err) {
+    console.error('Google Drive upload error:', err.message);
+  }
+}
+
+// At startup
+downloadDatabase().then(() => {
+    const PORT = 8000;
+    app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
+});
+
 app.use(limiter);
 app.set('trust proxy', 1);
 
@@ -681,5 +741,3 @@ const fs = require('fs');
 
 
 // تشغيل الخادم
-const PORT = 8000;
-app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
