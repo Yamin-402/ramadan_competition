@@ -69,8 +69,15 @@ async function downloadDatabase() {
   }
 }
 
+db.run('PRAGMA wal_checkpoint(FULL);', (err) => {
+    if (err) {
+      console.error('Error running PRAGMA wal_checkpoint:', err);
+    } else {
+      console.log('PRAGMA wal_checkpoint(FULL) executed successfully.');
+    }
+  });
+  
 // Upload database to Google Drive
-sqlite3 database.db "PRAGMA wal_checkpoint(FULL);"
 async function uploadDatabase() {
   try {
     console.log('Uploading database to Google Drive...');
