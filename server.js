@@ -76,7 +76,7 @@ db.run('PRAGMA wal_checkpoint(FULL);', (err) => {
       console.log('PRAGMA wal_checkpoint(FULL) executed successfully.');
     }
   });
-  
+
 // Upload database to Google Drive
 async function uploadDatabase() {
   try {
@@ -779,7 +779,6 @@ db.run('PRAGMA journal_mode=WAL;', (err) => {
     }
 });
 
-const fs = require('fs');
 
 
 // تشغيل الخادم
