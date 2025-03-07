@@ -1,0 +1,7 @@
+# .dockerignore
+!package.json
+!package-lock.json
+!server.js
+!public/
+!views/
+!database.db
