@@ -15,108 +15,6 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
-require('dotenv').config(); // Load .env file
-const { google } = require('googleapis');
-const fs = require('fs');
-
-const DB_FILE = './database.db';
-const DRIVE_FILE_ID = process.env.GOOGLE_DRIVE_FILE_ID;
-
-// Log environment variables for debugging
-console.log('Google Drive File ID:', DRIVE_FILE_ID);
-if (!DRIVE_FILE_ID) {
-  console.error('Error: GOOGLE_DRIVE_FILE_ID is missing!');
-  process.exit(1);
-}
-
-// Verify service account key file
-const keyFilePath = path.join(__dirname, 'service-account-key.json');
-console.log('Service account key file path:', keyFilePath);
-
-if (!fs.existsSync(keyFilePath)) {
-  console.error('Error: Service account key file not found!');
-  process.exit(1);
-}
-
-// Initialize Google Drive client with service account
-const auth = new google.auth.GoogleAuth({
-  keyFile: keyFilePath,
-  scopes: ['https://www.googleapis.com/auth/drive.file'],
-});
-
-// Log service account email
-auth.getCredentials().then((credentials) => {
-  console.log('Service account email:', credentials.client_email);
-}).catch((err) => {
-  console.error('Error retrieving service account email:', err);
-});
-
-const drive = google.drive({ version: 'v3', auth });
-
-// Download database from Google Drive
-async function downloadDatabase() {
-  try {
-    console.log('Downloading database from Google Drive...');
-    const response = await drive.files.get(
-      { fileId: DRIVE_FILE_ID, alt: 'media' },
-      { responseType: 'stream' }
-    );
-    response.data
-      .pipe(fs.createWriteStream(DB_FILE))
-      .on('finish', () => console.log('Database downloaded!'));
-  } catch (err) {
-    console.error('Google Drive download error:', err.message);
-  }
-}
-
-db.run('PRAGMA wal_checkpoint(FULL);', (err) => {
-    if (err) {
-      console.error('Error running PRAGMA wal_checkpoint:', err);
-    } else {
-      console.log('PRAGMA wal_checkpoint(FULL) executed successfully.');
-    }
-  });
-
-// Upload database to Google Drive
-async function uploadDatabase() {
-  try {
-    console.log('Uploading database to Google Drive...');
-    await drive.files.update({
-      fileId: DRIVE_FILE_ID,
-      media: {
-        body: fs.createReadStream(DB_FILE),
-        mimeType: 'application/x-sqlite3'
-      }
-    });
-    console.log('Database uploaded!');
-  } catch (err) {
-    console.error('Google Drive upload error:', err.message);
-  }
-}
-
-// At startup
-downloadDatabase().then(() => {
-  const PORT = 8000;
-  app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
-});
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('Shutting down...');
-  await uploadDatabase();
-  process.exit(0);
-});
-
-// Crash protection
-process.on('uncaughtException', (err) => {
-  console.error('CRASH PREVENTION:', err);
-  uploadDatabase().finally(() => process.exit(1));
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('ASYNC ERROR:', err);
-});
-
 app.use(limiter);
 app.set('trust proxy', 1);
 
@@ -666,11 +564,7 @@ app.post('/complete-task/:userId', (req, res) => {
                 }
 
                 // ✅ التحقق من إعادة التوجيه بشكل صحيح
-                if (task.task_category === 'ممنوع') {
-    return res.redirect(`/profile/${userId}/prohibited-tasks`);
-} else {
-    return res.redirect(`/profile/${userId}/tasks`);
-}
+                return res.redirect(`/profile/${userId}/prohibited-tasks`);
             });
         });
     });
@@ -779,6 +673,9 @@ db.run('PRAGMA journal_mode=WAL;', (err) => {
     }
 });
 
+const fs = require('fs');
 
 
 // تشغيل الخادم
+const PORT = 8000;
+app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
