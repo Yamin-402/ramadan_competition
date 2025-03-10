@@ -1,0 +1,13 @@
+# fly.toml
+app = "ramadan-competition"
+primary_region = "fra"  # Frankfurt, Germany
+
+[mounts]
+source = "data"
+destination = "/data"  # Mount volume to /data
+
+[http_service]
+internal_port = 8000    # Match your app’s port
+force_https = true
+auto_start_machines = true
+auto_stop_machines = true
