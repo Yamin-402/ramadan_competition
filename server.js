@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const moment = require('moment-timezone');
 const app = express();
-const db = new sqlite3.Database('./database.db');
+// Use an absolute path for SQLite (Fly.io uses `/app` as the root directory)
+const DB_FILE = path.join(__dirname, 'database.db');
+const db = new sqlite3.Database(DB_FILE);
 // ramadan
 const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
 const today = moment().tz("Africa/Cairo");
@@ -681,5 +683,7 @@ const fs = require('fs');
 
 
 // تشغيل الخادم
-const PORT = 8000;
-app.listen(PORT, () => console.log('الخادم يعمل على http://localhost:' + PORT));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`الخادم يعمل على http://localhost:${PORT}`);
+});
