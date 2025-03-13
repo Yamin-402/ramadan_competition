@@ -5,7 +5,7 @@ const path = require('path');
 const moment = require('moment-timezone');
 const app = express();
 // Use an absolute path for SQLite (Fly.io uses `/app` as the root directory)
-const DB_FILE = path.join(__dirname, 'data', 'database.db'); // Now in /app/data
+const DB_FILE = path.join(__dirname,'database.db'); // Now in /app/data
 const db = new sqlite3.Database(DB_FILE);
 // ramadan
 const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
@@ -17,6 +17,15 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 دقيقة
     max: 100 // حدد عدد الطلبات لكل IP
 });
+
+const admin = {
+    username: 'yaminadwaa',
+    password: bcrypt.hashSync('Yamin1212', 8)
+};
+db.run(`INSERT OR IGNORE INTO users (username, password, is_admin) 
+    VALUES (?, ?, 1)`, [admin.username, admin.password]);
+});
+
 app.use(limiter);
 app.set('trust proxy', 1);
 
