@@ -17,18 +17,60 @@ const limiter = rateLimit({
     max: 100 // حدد عدد الطلبات لكل IP
 });
 
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const path = require('path');
+const moment = require('moment-timezone');
+const app = express();
+const DB_FILE = path.join('/data', 'database.db');
+const db = new sqlite3.Database(DB_FILE);
+
+// رمضان
+const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
+const today = moment().tz("Africa/Cairo");
+const dayOfRamadan = today.isSameOrAfter(ramadanStart) ? today.diff(ramadanStart, "days") + 1 : 0; // يبدأ العد من 1
+
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 دقيقة
+    max: 100 // حدد عدد الطلبات لكل IP
+});
+
 const admin = {
     username: 'yaminadwaa',
     password: bcrypt.hashSync('Yamin1212', 8)
 };
+
+// Ensure the users table exists before inserting the admin user
+db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT,
+    is_admin INTEGER DEFAULT 0,
+    points INTEGER DEFAULT 0,
+    show_in_leaderboard INTEGER DEFAULT 1
+)`);
+
+// Insert the admin user if it doesn't already exist
 db.run(`INSERT OR IGNORE INTO users (username, password, is_admin) 
-    VALUES (?, ?, 1)`, [admin.username, admin.password]);
+    VALUES (?, ?, 1)`, [admin.username, admin.password], function(err) {
+    if (err) {
+        console.error("❌ خطأ أثناء إضافة المستخدم الإداري:", err.message);
+    } else {
+        if (this.changes > 0) {
+            console.log("✅ تم إضافة المستخدم الإداري بنجاح!");
+        } else {
+            console.log("✅ المستخدم الإداري موجود بالفعل، لا حاجة للإضافة.");
+        }
+    }
 });
 
 app.use(limiter);
 app.set('trust proxy', 1);
 
 moment.tz.setDefault('Africa/Cairo');
+
 
 
 db.run(`ALTER TABLE task_logs ADD COLUMN fasting_status TEXT`, (err) => {
