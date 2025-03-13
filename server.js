@@ -6,25 +6,6 @@ const moment = require('moment-timezone');
 const app = express();
 const DB_FILE = path.join('/data', 'database.db');
 const db = new sqlite3.Database(DB_FILE);
-// ramadan
-const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
-const today = moment().tz("Africa/Cairo");
-const dayOfRamadan = today.isSameOrAfter(ramadanStart) ? today.diff(ramadanStart, "days") + 1 : 0; // يبدأ العد من 1
-//
-const rateLimit = require('express-rate-limit');
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 دقيقة
-    max: 100 // حدد عدد الطلبات لكل IP
-});
-
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs');
-const path = require('path');
-const moment = require('moment-timezone');
-const app = express();
-const DB_FILE = path.join('/data', 'database.db');
-const db = new sqlite3.Database(DB_FILE);
 
 // رمضان
 const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
