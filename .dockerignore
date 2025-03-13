@@ -1,11 +1,9 @@
 node_modules/
 .git/
 .DS_Store
-.env
 npm-debug.log*
 dist/
 coverage/
 *.md
-*.sqlite
 *.mp4
 *.zip
