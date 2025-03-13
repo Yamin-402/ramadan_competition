@@ -5,4 +5,8 @@ primary_region = "fra"
 auto_start_machines = true
 auto_stop_machines = true
 force_https = true
-internal_port = 8000  # Changed from 8_000 (underscore removed)
+internal_port = 8000
+
+[[mounts]]
+destination = "/data"
+source = "data"

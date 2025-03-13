@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const moment = require('moment-timezone');
 const app = express();
-const DB_FILE = path.join(__dirname, 'database.db');
+const DB_FILE = path.join('/data', 'database.db');
 const db = new sqlite3.Database(DB_FILE);
 // ramadan
 const ramadanStart = moment.tz("2025-03-01", "YYYY-MM-DD", "Africa/Cairo"); // تاريخ بداية رمضان 2024
