@@ -48,13 +48,14 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6><%= log.task_name %></h6>
-                        <small>النوع: <%= log.task_type %></small>
+                        <small>النوع: <%= log.task_type %></small><br>
                         <% if(log.task_type === 'موقوت' && log.value) { %>
-                            <small>الدقائق: <%= log.value %></small>
+                            <small>الدقائق: <%= log.value %></small><br>
                         <% } %>
                         <% if(log.value && log.task_type === 'عددية' ) { %>
-                            <small>الكمية: <%= log.value %></small>
+                            <small>الكمية: <%= log.value %></small><br>
                         <% } %>
+                        <small>وقت اليوم : <%= log.fasting_status === 'not_fasting' ? 'فطار' : 'صيام' %></small>
                     </div>
                     <span class="<%= log.points > 0 ? 'text-success' : 'text-danger' %>">
                         <%= log.points %> نقطة
