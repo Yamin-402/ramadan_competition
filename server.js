@@ -123,7 +123,7 @@ app.post('/login', (req, res) => {
         }
         
         if (user.is_admin) return res.redirect('/admin/tasks'); // تحويل المشرف إلى إدارة المهام
-        res.redirect(`/profile/${user.id}/tasks`); // تحويل المستخدم العادي إلى صفحة المهام
+        res.redirect(`/profile/${user.id}/winner`); // تحويل المستخدم العادي إلى صفحة المهام
     });
 });
 
