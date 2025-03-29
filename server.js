@@ -167,13 +167,6 @@ app.get('/profile/:id/winner', (req, res) => {
     });
 });
 
-
-
-app.get('/profile/:id/tasks', (req, res) => {
-    console.log("🔹 تم تنفيذ /profile/:id/tasks");
-    const userId = req.params.id;
-    console.log("🔹 User ID:", userId);
-
     
 app.get('/profile/:id/tasks', (req, res) => {
     const userId = req.params.id;
