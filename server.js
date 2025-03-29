@@ -129,8 +129,55 @@ app.post('/login', (req, res) => {
 
 // Routes الملف الشخصي
 
+app.get('/profile/:id/winner', (req, res) => {
+    const userId = req.params.id;
+    const { fajr, maghrib } = getPrayerTimes();
+    const now = moment().tz("Africa/Cairo");
+    const isFastingNow = now.isBetween(moment(fajr, "HH:mm"), moment(maghrib, "HH:mm"));
+
+    db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user) {
+            console.error(err);
+            return res.status(500).send("خطأ في جلب بيانات المستخدم");
+        }
+
+        db.all('SELECT * FROM tasks', (err, tasks) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send("خطأ في جلب قائمة المهام");
+            }
+
+            // Add this query to get all users
+            db.all('SELECT * FROM users WHERE show_in_leaderboard = 1 AND is_admin = 0 ORDER BY points DESC', (err, users) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send("خطأ في جلب بيانات المتصدرين");
+                }
+
+                res.render('profile/winner', { 
+                    user, 
+                    users, // Pass the users list to the template
+                    tasks, 
+                    moment, 
+                    dayOfRamadan, 
+                    isFastingNow 
+                });
+            });
+        });
+    });
+});
+
+
+
+app.get('/profile/:id/tasks', (req, res) => {
+    console.log("🔹 تم تنفيذ /profile/:id/tasks");
+    const userId = req.params.id;
+    console.log("🔹 User ID:", userId);
+
+    
 app.get('/profile/:id/tasks', (req, res) => {
     const userId = req.params.id;
+    console.log("User ID:", req.params.id);
 
     // جلب أوقات الفجر والمغرب
     const { fajr, maghrib } = getPrayerTimes();
