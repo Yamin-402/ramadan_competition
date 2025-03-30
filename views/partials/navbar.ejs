@@ -8,20 +8,10 @@
             <ul class="navbar-nav ms-auto">
                 <% if (user) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/profile/<%= user.id %>/tasks">المهام</a>
+                        <a class="nav-link" href="/profile/<%= user.id %>/winner">الفائز</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile/<%= user.id %>/prohibited-tasks">الممنوعات</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile/<%= user.id %>/logs">سجل النشاطات</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/leaderboard/<%= user.id %>">لوحة المتصدرين</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">تسجيل الخروج</a>
                     </li>

@@ -41,74 +41,239 @@
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            margin: 0.5rem;
         }
 
+        /* Responsive Winner Podium */
         .winner-podium {
             display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
             margin-bottom: 2rem;
             position: relative;
         }
 
+        @media (min-width: 768px) {
+            .winner-podium {
+                grid-template-columns: 1fr 1.5fr 1fr;
+                gap: 2rem;
+                align-items: flex-end;
+            }
+            
+            .leaderboard-container {
+                padding: 2rem;
+                margin: 0 auto;
+            }
+            
+            .first-place {
+                transform: translateY(-30px);
+            }
+            
+            .first-place:hover {
+                transform: scale(1.05) translateY(-35px);
+            }
+        }
+
+        /* Base Winner Card Styles */
         .winner-card {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 1rem;
+            padding: 1.25rem;
             text-align: center;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .winner-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        /* First Place Special Styling */
+        .first-place {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            z-index: 2;
+            order: -1;
         }
 
+        @media (min-width: 768px) {
+            .first-place {
+                order: 0;
+            }
+        }
+
+        /* Profile Images */
         .profile-image {
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 6px solid var(--gold-accent);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            border: 5px solid;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
             animation: float 3s infinite ease-in-out;
         }
 
         .first-place .profile-image {
-            width: 250px;
-            height: 250px;
+            width: 150px;
+            height: 150px;
+            border-color: var(--gold-accent);
             animation: glow 2s infinite, float 3s infinite ease-in-out;
         }
 
+        @media (min-width: 768px) {
+            .profile-image {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .first-place .profile-image {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        .winner-card:nth-child(1) .profile-image { /* Second place */
+            border-color: #c0c0c0; /* Silver */
+        }
+
+        .winner-card:nth-child(3) .profile-image { /* Third place */
+            border-color: #cd7f32; /* Bronze */
+            background-color: #fff; /* For UI Avatars */
+        }
+
+        /* Rank Badges */
         .rank-badge {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: var(--secondary-gradient);
+            background: rgba(0, 0, 0, 0.6);
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: bold;
+            font-size: 0.85rem;
+            backdrop-filter: blur(5px);
         }
 
+        .first-place .rank-badge {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Text Styling */
+        .winner-card h2 {
+            font-size: 1.6rem;
+            margin: 1rem 0 0.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .winner-card h3 {
+            font-size: 1.4rem;
+            margin: 1rem 0 0.5rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .winner-card .text-light {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .winner-card h2 {
+                font-size: 1.8rem;
+            }
+            
+            .winner-card h3 {
+                font-size: 1.5rem;
+            }
+            
+            .winner-card .text-light {
+                font-size: 1.1rem;
+            }
+            
+            .rank-badge {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Achievement Banners */
         .achievement-banner {
-            background: rgba(0,0,0,0.3);
-            padding: 1rem;
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.75rem;
+            border-radius: 12px;
             margin-top: 1rem;
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .achievement-banner h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .first-place .achievement-banner h4 {
+            color: var(--gold-accent);
+        }
+
+        .achievement-banner p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+            margin-bottom: 0;
+        }
+
+        @media (min-width: 768px) {
+            .achievement-banner {
+                padding: 1rem;
+            }
+            
+            .achievement-banner h4 {
+                font-size: 1.1rem;
+            }
+            
+            .achievement-banner p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Hover Effects */
+        .winner-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .winner-card:hover {
+                transform: scale(1.05) translateY(-10px);
+            }
+        }
+
+        /* Ramadan Stats */
         .ramadan-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr;
             gap: 1rem;
             margin-top: 2rem;
+        }
+
+        @media (min-width: 576px) {
+            .ramadan-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .ramadan-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .stat-card {
@@ -124,6 +289,22 @@
             background: rgba(255,255,255,0.2);
         }
 
+        .stat-card i {
+            font-size: 2.5rem;
+        }
+
+        .stat-card h4 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* Progress Container */
         .progress-container {
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
@@ -132,7 +313,7 @@
         }
 
         .detailed-progress {
-            height: 15px;
+            height: 12px;
             background: linear-gradient(to right, #4CAF50, #81c784);
             border-radius: 10px;
         }
@@ -141,12 +322,24 @@
             background: linear-gradient(to right, #ff9966, #ff5e62);
         }
 
+        /* Spiritual Journey Card */
         .spiritual-journey-card {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
             padding: 1rem;
             margin-top: 2rem;
             text-align: center;
+        }
+
+        .spiritual-journey-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .spiritual-journey-card p {
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
         .celestial-bg {
@@ -160,152 +353,41 @@
             opacity: 0.6;
         }
 
-       /* Winner Podium Styling */
-.winner-podium {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr;
-    gap: 2rem;
-    align-items: flex-end; /* Align cards to bottom */
-    margin-bottom: 3rem;
-}
+        /* Header responsive adjustments */
+        .responsive-header h1 {
+            font-size: 1.8rem;
+        }
 
-/* Base Winner Card Styles */
-.winner-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
+        .responsive-header p {
+            font-size: 1rem;
+        }
 
-/* First Place Special Styling */
-.first-place {
-    background: rgba(255, 215, 0, 0.15);
-    border: 1px solid rgba(255, 215, 0, 0.4);
-    transform: translateY(-30px); /* Raise first place higher */
-    z-index: 2;
-}
+        @media (min-width: 576px) {
+            .responsive-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .responsive-header p {
+                font-size: 1.1rem;
+            }
+        }
 
-/* Profile Images */
-.profile-image {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    display: block;
-    margin: 0 auto;
-}
-
-.first-place .profile-image {
-    width: 180px;
-    height: 180px;
-    border-color: var(--gold-accent);
-    animation: glow 2s infinite, float 3s infinite ease-in-out;
-}
-
-.winner-card:nth-child(1) .profile-image { /* Second place */
-    border-color: #c0c0c0; /* Silver */
-}
-
-.winner-card:nth-child(3) .profile-image { /* Third place */
-    border-color: #cd7f32; /* Bronze */
-    background-color: #fff; /* For UI Avatars */
-}
-
-/* Rank Badges */
-.rank-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    backdrop-filter: blur(5px);
-}
-
-.first-place .rank-badge {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-/* Text Styling */
-.winner-card h2 {
-    font-size: 1.8rem;
-    margin: 1rem 0 0.5rem;
-    color: #fff;
-    font-weight: 700;
-}
-
-.winner-card h3 {
-    font-size: 1.5rem;
-    margin: 1rem 0 0.5rem;
-    color: #fff;
-    font-weight: 600;
-}
-
-.winner-card .text-light {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1rem;
-}
-
-/* Achievement Banners */
-.achievement-banner {
-    background: rgba(0, 0, 0, 0.25);
-    padding: 1rem;
-    border-radius: 12px;
-    margin-top: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.achievement-banner h4 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #fff;
-}
-
-.first-place .achievement-banner h4 {
-    color: var(--gold-accent);
-}
-
-.achievement-banner p {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.4;
-}
-
-/* Hover Effects */
-.winner-card:hover {
-    transform: scale(1.03) translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-}
-
-.first-place:hover {
-    transform: scale(1.03) translateY(-35px);
-}
-
+        @media (min-width: 768px) {
+            .responsive-header h1 {
+                font-size: 2.5rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="celestial-bg"></div>
-    <div class="container py-5">
+    <div class="container py-4">
         <div class="leaderboard-container">
             <!-- Ramadan Header -->
-            <div class="text-center mb-5">
-                <h1 class="display-4">
+            <div class="text-center mb-4 responsive-header">
+                <h1>
                     <i class="bi bi-stars text-warning"></i> 
-                    لوحة افائزين - رمضان الكريم
+                    لوحة الفائزين - رمضان الكريم
                 </h1>
                 <p class="lead">رحلة دينية من التدني للسمو</p>
             </div>
@@ -317,8 +399,8 @@
                     <div class="winner-card">
                         <div class="rank-badge">المركز الثاني</div>
                         <img src="https://ui-avatars.com/api/?name=<%= users[1].username %>&background=random" 
-     alt="<%= users[1].username %>" 
-     class="profile-image">
+                            alt="<%= users[1].username %>" 
+                            class="profile-image">
                         <h3 class="mt-3"><%= users[1].username %></h3>
                         <p class="text-light"><%= users[1].points.toFixed(2) %> نقطة</p>
                         <div class="achievement-banner">
@@ -333,8 +415,8 @@
                     <div class="winner-card first-place">
                         <div class="rank-badge">البطل الأول</div>
                         <img src="https://ui-avatars.com/api/?name=<%= users[0].username %>&background=random" 
-     alt="<%= users[0].username %>" 
-     class="profile-image">
+                            alt="<%= users[0].username %>" 
+                            class="profile-image">
                         <h2 class="mt-3"><%= users[0].username %></h2>
                         <p class="text-light"><%= users[0].points.toFixed(2) %> نقطة</p>
                         <div class="achievement-banner">
@@ -349,14 +431,14 @@
                     <div class="winner-card">
                         <div class="rank-badge">المركز الثالث</div>
                         <img src="https://ui-avatars.com/api/?name=<%= users[2].username %>&background=random" 
-                        alt="<%= users[2].username %>" 
-                        class="profile-image">
+                            alt="<%= users[2].username %>" 
+                            class="profile-image">
                         <h3 class="mt-3"><%= users[2].username %></h3>
                         <p class="text-light"><%= users[2].points.toFixed(2) %> نقطة</p>
                         <div class="achievement-banner">
-                    <h4>متصدر التحدي الفاشل<h4>
-                    <p>حقق أعلى مستوى من الفشل في رمضان</p>
-                    </div>
+                            <h4>متصدر التحدي الفاشل</h4>
+                            <p>حقق أعلى مستوى من الفشل في رمضان</p>
+                        </div>
                     </div>
                 <% } %>
             </div>
