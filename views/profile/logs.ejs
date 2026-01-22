@@ -17,7 +17,7 @@
             <div class="card-body">
                 <% const groupedLogs = {}; %>
 <% logs.forEach(log => { %>
-    <% const day = moment(log.created_at).tz("Africa/Cairo").format("اليوم: D من رمضان"); %>
+    <% const day = moment(log.created_at).tz("Africa/Cairo").format("اليوم: D من شعبان"); %>
     <% if (!groupedLogs[day]) { %>
         <% groupedLogs[day] = { logs: [], totalPoints: 0, totalDeductions: 0, totalBalance: 0 }; %>
     <% } %>
@@ -31,7 +31,7 @@
 <% }) %>
 
 <% let totalBalance = 0; %>
-<% Object.keys(groupedLogs).sort((a, b) => moment(b, "اليوم: D من رمضان") - moment(a, "اليوم: D من رمضان")).forEach(day => { %>
+<% Object.keys(groupedLogs).sort((a, b) => moment(b, "اليوم: D من شعبان") - moment(a, "اليوم: D من شعبان")).forEach(day => { %>
     <div class="mb-4">
         <h5><%= day %></h5>
         <div class="alert alert-info">
