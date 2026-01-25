@@ -33,7 +33,7 @@
 <% let totalBalance = 0; %>
 <% Object.keys(groupedLogs).sort((a, b) => moment(b, "اليوم: D من شعبان") - moment(a, "اليوم: D من شعبان")).forEach(day => { %>
     <div class="mb-4">
-        <h5><%= day %></h5>
+        <h5>اليوم : <%= dayOfRamadan %> من شعبان </h5>
         <div class="alert alert-info">
             <strong>النقاط المكتسبة:</strong> <%= groupedLogs[day].totalPoints %>
             <br>
