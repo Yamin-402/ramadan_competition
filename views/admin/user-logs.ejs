@@ -58,14 +58,25 @@ let knownDate = moment.tz("2026-01-19", "YYYY-MM-DD", "Africa/Cairo");
        .sort((a,b)=> new Date(b.created_at) - new Date(a.created_at))
        .forEach(log => { %>
 
-        <div class="alert alert-light mb-2">
-            <h6><%= log.task_name %></h6>
-            <span class="<%= log.points > 0 ? 'text-success' : 'text-danger' %>">
-                <%= log.points %> نقطة
-            </span>
-        </div>
-
-    <% }) %>
+         <div class="alert alert-light mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6><%= log.task_name %></h6>
+                        <small>النوع: <%= log.task_type %></small><br>
+                        <% if(log.task_type === 'موقوت' && log.value) { %>
+                            <small>الدقائق: <%= log.value %></small><br>
+                        <% } %>
+                        <% if(log.value && log.task_type === 'عددية' ) { %>
+                            <small>الكمية: <%= log.value %></small><br>
+                        <% } %>
+                        <small>وقت اليوم : <%= log.fasting_status === 'not_fasting' ? 'فطار' : 'صيام' %></small>
+                    </div>
+                    <span class="<%= log.points > 0 ? 'text-success' : 'text-danger' %>">
+                        <%= log.points %> نقطة
+                    </span>
+                </div>
+            </div>
+        <% }) %>
 
 </div>
   <% }) %>
